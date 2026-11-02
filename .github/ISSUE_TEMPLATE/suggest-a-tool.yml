@@ -1,0 +1,31 @@
+name: Suggest a tool
+description: A small tool you wish tooljar had.
+title: "Tool idea: "
+labels: ["tool idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! tooljar tools are small, free and do one job well, each with a free API.
+        Tell us about the job, not only the feature: what were you trying to do?
+  - type: textarea
+    id: job
+    attributes:
+      label: What should the tool do?
+      placeholder: "Example: show me when a domain expires, so I can renew it in time."
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: How do you do this today?
+      description: A website, a command, a script, or by hand. What is annoying about it?
+  - type: dropdown
+    id: use
+    attributes:
+      label: How would you use it?
+      multiple: true
+      options:
+        - In the browser
+        - From the command line (curl)
+        - From my code (API or package)

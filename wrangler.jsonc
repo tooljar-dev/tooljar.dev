@@ -1,0 +1,35 @@
+// Cloudflare Worker "tooljar-hub": the home page at https://tooljar.dev (www redirects there).
+// SAFETY (workspace rule, decision 0004): run wrangler ONLY from this folder, ALWAYS with
+// --config wrangler.jsonc, and run `npm run cf:dry` before every deploy by hand.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tooljar-hub",
+  // The Cloudflare account "tooljar" (the same one as ip and email). Not a secret.
+  "account_id": "3ac929240c8524f806d886eb8441e71c",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-20",
+  // No *.workers.dev copy of the site: it would compete with tooljar.dev in search.
+  "workers_dev": false,
+  "preview_urls": false,
+  // Custom domains only add web records. The apex's MX and TXT records (Email Routing for
+  // saba@tooljar.dev) stay as they are.
+  "routes": [
+    { "pattern": "tooljar.dev", "custom_domain": true },
+    { "pattern": "www.tooljar.dev", "custom_domain": true }
+  ],
+  // Static files (icons, logo). The Worker runs first, so www.tooljar.dev/<anything> can
+  // redirect to tooljar.dev; it then hands file paths to ASSETS.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": {
+    // Leave empty. Cloudflare's automatic Web Analytics already adds the beacon to every
+    // tooljar.dev host; a second copy would count every visit twice.
+    "ANALYTICS_TOKEN": ""
+  },
+  // No stored request logs: the privacy page says we don't store IP addresses.
+  // Use `npx wrangler tail --config wrangler.jsonc` to watch live requests when debugging.
+  "observability": { "enabled": false }
+}
