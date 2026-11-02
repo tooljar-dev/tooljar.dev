@@ -99,10 +99,16 @@ describe("addresses", () => {
     expect(res.headers.get("location")).toBe("https://tooljar.dev/favicon.svg");
   });
 
-  it("sends http to https", async () => {
+  it("sends browsers from http to https", async () => {
     const res = await call("/", { ...BROWSER, "cf-visitor": '{"scheme":"http"}' });
     expect(res.status).toBe(301);
     expect(res.headers.get("location")).toBe("https://tooljar.dev/");
+  });
+
+  it("answers plain `curl tooljar.dev` over http (no redirect)", async () => {
+    const res = await call("/", { ...CURL, "cf-visitor": '{"scheme":"http"}' });
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain("$ curl ip.tooljar.dev");
   });
 
   it("drops a trailing slash", async () => {

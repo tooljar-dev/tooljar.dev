@@ -40,9 +40,12 @@ await expect("home page lists both tools and shows an IP", async () => {
     ? null
     : "CSP lacks connect-src 'self' (analytics beacon)";
 });
-await expect("curl gets the tool list as text", async () => {
+await expect("curl gets the tool list as text, over https and plain http", async () => {
   const text = await (await get("/")).text();
-  return text.includes("$ curl ip.tooljar.dev") ? null : text.slice(0, 80);
+  if (!text.includes("$ curl ip.tooljar.dev")) return text.slice(0, 80);
+  if (!BASE.startsWith("https://")) return null;
+  const plain = await (await get("/", CURL, BASE.replace("https://", "http://"))).text();
+  return plain.includes("$ curl ip.tooljar.dev") ? null : `http: ${plain.slice(0, 80)}`;
 });
 await expect("tools.json lists the tools, with CORS", async () => {
   const res = await get("/tools.json");

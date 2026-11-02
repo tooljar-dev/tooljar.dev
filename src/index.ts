@@ -81,7 +81,10 @@ async function route(request: Request, env: Env): Promise<Response> {
     return Response.redirect(url.toString(), 301);
   }
   // Browsers never use http:// here (.dev forces HTTPS), but old links and crawlers might.
-  if (/"scheme":"http"/.test(request.headers.get("cf-visitor") ?? "")) {
+  // Scripts keep plain http: `curl tooljar.dev` uses it, and "Always Use HTTPS" is off on
+  // purpose in this zone (the same as ip and email).
+  const format = pickFormat(request);
+  if (format === "html" && /"scheme":"http"/.test(request.headers.get("cf-visitor") ?? "")) {
     url.protocol = "https:";
     return Response.redirect(url.toString(), 301);
   }
@@ -95,7 +98,6 @@ async function route(request: Request, env: Env): Promise<Response> {
 
   switch (path) {
     case "/": {
-      const format = pickFormat(request);
       if (format === "json")
         return file(`${JSON.stringify(toolsJson(), null, 2)}\n`, "application/json", {
           "cache-control": "no-store",
